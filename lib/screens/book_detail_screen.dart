@@ -21,13 +21,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   @override
   void initState() {
     super.initState();
-
     // Listen for audio completion
     audioPlayer.onPlayerComplete.listen((event) {
       // Move to the next key point when audio is completed
       if (currentKeyPointIndex < widget.book.keyPoints.length - 1) {
         setState(() {
           currentKeyPointIndex++;
+          audioPlayerProgress = 0.0;
         });
         playAudio(widget.book.keyPoints[currentKeyPointIndex].audioFile);
       } else {
@@ -103,8 +103,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               children: [
                 // Play bar
                 Row(
-                  mainAxisAlignment: MainAxisAlignment
-                      .spaceEvenly, // Align buttons horizontally
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Align buttons horizontally
                   children: [
                     // Rewind Button
                     IconButton(
@@ -121,8 +120,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         if (isPlaying) {
                           pauseAudio();
                         } else {
-                          playAudio(widget
-                              .book.keyPoints[currentKeyPointIndex].audioFile);
+                          playAudio(widget.book.keyPoints[currentKeyPointIndex].audioFile);
                         }
                       },
                     ),
@@ -139,17 +137,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
                 // LinearProgressIndicator
                 LinearProgressIndicator(
-                  value: audioPlayerProgress /
-                      widget.book.keyPoints[currentKeyPointIndex].duration
-                          .inSeconds,
+                  value: audioPlayerProgress / widget.book.keyPoints[currentKeyPointIndex].duration.inSeconds,
                 ),
               ],
             ),
           ),
 
           // Key Point Indicator
-          Text(
-              'Key Point ${currentKeyPointIndex + 1} of ${widget.book.keyPoints.length}'),
+          Text('Key Point ${currentKeyPointIndex + 1} of ${widget.book.keyPoints.length}'),
         ],
       ),
     );
@@ -161,7 +156,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         setState(() {
           currentKeyPointIndex = index;
         });
-        playAudio(widget.book.keyPoints[index].audioFile);
+        // playAudio(widget.book.keyPoints[index].audioFile);
       },
       child: Container(
         margin: EdgeInsets.all(8),
@@ -190,8 +185,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       UrlSource sourceUri = UrlSource(audioFile);
 
       // Play audio
-      await audioPlayer.play(sourceUri,
-          position: Duration(seconds: audioPlayerProgress.round()));
+      await audioPlayer.play(sourceUri, position: Duration(seconds: audioPlayerProgress.round()));
       setState(() {
         isPlaying = true;
       });

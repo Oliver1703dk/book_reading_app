@@ -1,4 +1,5 @@
 // models/book.dart
+
 class Book {
   final String title;
   final String description;
@@ -18,6 +19,7 @@ class KeyPoint {
   final String text;
   final String audioFile;
   final Duration duration; // Duration of the key point audio
+  // late Duration duration; // Duration of the key point audio
 
   KeyPoint({
     required this.text,
