@@ -51,80 +51,6 @@ class _MyLoadingScreenState extends State<MyLoadingScreen> {
   }
 
   void navigateToHomeScreen(BuildContext context) {
-    Map<String, dynamic> rdpd = {
-      "name": "Rich Dad Poor Dad",
-      "desc": "This is the description of Rich Dad Poor Dad",
-      "audio": [
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/rdpd/audio/1.mp3',
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/rdpd/audio/2.mp3',
-        // Add more audio URLs as needed
-      ],
-      "duration": [
-        Duration(seconds: 176),
-        Duration(seconds: 141),
-        // Add more durations as needed
-      ],
-      "keyPoint": [
-        "The Rich Don't Work for Money",
-        "Assets vs. Liabilities",
-        // Add more key points as needed
-      ],
-      "image":
-          "https://github.com/Oliver1703dk/AudioFiles/raw/main/books/rdpd/rdpd_image.png",
-    };
-
-    Map<String, dynamic> taonr = {
-      "name": "The Almanack Of Naval Ravikant",
-      "desc": "This is the description of The Almanack Of Naval Ravikant",
-      "audio": [
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/taonr/audio/1.wav',
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/taonr/audio/2.wav',
-        // Add more audio URLs as needed
-      ],
-      "duration": [
-        Duration(seconds: 120),
-        Duration(seconds: 123),
-        // Add more durations as needed
-      ],
-      "keyPoint": [
-        "Happiness and Wealth",
-        "Personal Development",
-        // Add more key points as needed
-      ],
-      "image":
-          "https://github.com/Oliver1703dk/AudioFiles/raw/main/books/taonr/taonr_image.png",
-    };
-
-    Map<String, dynamic> dw = {
-      "name": "Deep Work: Rules for Focused Success in a Distracted World",
-      "desc":
-          "This is the description of Deep Work: Rules for Focused Success in a Distracted World",
-      "audio": [
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/dw/audio/1.wav',
-        'https://github.com/Oliver1703dk/AudioFiles/raw/main/books/dw/audio/2.wav',
-        // Add more audio URLs as needed
-      ],
-      "duration": [
-        Duration(seconds: 227),
-        Duration(seconds: 224),
-        // Add more durations as needed
-      ],
-      "keyPoint": [
-        "Definition of Deep Work",
-        "Shallow Work vs. Deep Work",
-        // Add more key points as needed
-      ],
-      "image":
-          "https://github.com/Oliver1703dk/AudioFiles/raw/main/books/dw/dw_image.png",
-    };
-
-    // List<Book> books = [
-    //   // createBook(rdpd),
-    //   // createBook(taonr),
-    //   // createBook(dw),
-    //   // Add more books as needed
-    // ];
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -136,7 +62,7 @@ class _MyLoadingScreenState extends State<MyLoadingScreen> {
   Future<void> fetchData() async {
     // Simulating a time-consuming task
     books = await fetchBooksFromGithub();
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 0));
     print("Data loaded successfully!");
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:reading_app1/backend/save_information.dart';
 import 'package:reading_app1/models/book.dart';
 
 Future<List<Book>> fetchBooksFromGithub() async {
@@ -10,6 +11,22 @@ Future<List<Book>> fetchBooksFromGithub() async {
       'https://api.github.com/repos/Oliver1703dk/books/contents/books/';
 
   try {
+    try {
+      final http.Response response = await http.get(
+        Uri.parse(githubRepoUrl),
+        //     headers: {
+        //   'Authorization':
+        //       'Bearer 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',
+        // }
+      );
+    } catch (e) {
+      print("Error $e happend, using another way");
+      final http.Response response =
+          await http.get(Uri.parse(githubRepoUrl), headers: {
+        'Authorization':
+            'Bearer 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',
+      });
+    }
     final http.Response response = await http.get(
       Uri.parse(githubRepoUrl),
       //     headers: {
@@ -31,8 +48,21 @@ Future<List<Book>> fetchBooksFromGithub() async {
 
       final List<Book> books = [];
       for (final String bookFolder in bookFolders) {
-        final Book book = await createBookFromFolder(githubRepoUrl, bookFolder);
-        books.add(book);
+        // Checking if the books is saved in shared Preferences
+        if (await SaveManager.checkSharedPreferences(bookFolder)) {
+          print("Fetching ${bookFolder} from shared preferences");
+          final Book? book =
+              await SaveManager.getBookFromSharedPreferences(bookFolder);
+          if (book != null) {
+            books.add(book);
+            continue;
+          }
+        } else {
+          print("Fetching ${bookFolder} from github");
+          final Book book =
+              await createBookFromFolder(githubRepoUrl, bookFolder);
+          books.add(book);
+        }
       }
 
       return books;
@@ -77,8 +107,8 @@ Future<Book> createBookFromFolder(String baseUrl, String bookFolder) async {
 
     final List<String> keyPoints = keyPointsResponse.body.split('\n');
     final List<String> keyPointsTime = keyPointsTimeResponse.body.split('\n');
-    print(keyPoints.length);
-    print(keyPointsTime.length);
+    // print(keyPoints.length);
+    // print(keyPointsTime.length);
 
     final List<KeyPoint> keyPointList = [];
     for (int i = 0; i < keyPoints.length; i++) {
@@ -95,6 +125,15 @@ Future<Book> createBookFromFolder(String baseUrl, String bookFolder) async {
         // duration: Duration(seconds: await getWavFileLength(audioFileUrl)),
       ));
     }
+    Book book = new Book(
+        title: title,
+        description: description,
+        coverImage: imageUrl,
+        keyPoints: keyPointList,
+        directoryName: bookFolderName);
+
+    // Saving the book to shared preferences
+    SaveManager.saveBookToSharedPreferences(book);
 
     return Book(
         title: title,
@@ -133,25 +172,5 @@ Future<Book> createBookFromFolder(String baseUrl, String bookFolder) async {
 //     return -1; // Return -1 to indicate an error
 //   }
 // }
-
-void main() async {
-  try {
-    final List<Book> books = await fetchBooksFromGithub();
-    for (final Book book in books) {
-      print('Title: ${book.title}');
-      print('Description: ${book.description}');
-      print('Cover Image: ${book.coverImage}');
-      print('Key Points:');
-      for (final KeyPoint keyPoint in book.keyPoints) {
-        print('  - ${keyPoint.text}');
-        print('    Audio File: ${keyPoint.audioFile}');
-        print('    Duration: ${keyPoint.duration}');
-      }
-      print('\n');
-    }
-  } catch (e) {
-    print('Error: $e');
-  }
-}
 
 class Book_generating {}
