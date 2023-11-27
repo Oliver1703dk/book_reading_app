@@ -103,7 +103,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               children: [
                 // Play bar
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Align buttons horizontally
+                  mainAxisAlignment: MainAxisAlignment
+                      .spaceEvenly, // Align buttons horizontally
                   children: [
                     // Rewind Button
                     IconButton(
@@ -120,7 +121,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         if (isPlaying) {
                           pauseAudio();
                         } else {
-                          playAudio(widget.book.keyPoints[currentKeyPointIndex].audioFile);
+                          playAudio(widget
+                              .book.keyPoints[currentKeyPointIndex].audioFile);
                         }
                       },
                     ),
@@ -137,14 +139,17 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
                 // LinearProgressIndicator
                 LinearProgressIndicator(
-                  value: audioPlayerProgress / widget.book.keyPoints[currentKeyPointIndex].duration.inSeconds,
+                  value: audioPlayerProgress /
+                      widget.book.keyPoints[currentKeyPointIndex].duration
+                          .inSeconds,
                 ),
               ],
             ),
           ),
 
           // Key Point Indicator
-          Text('Key Point ${currentKeyPointIndex + 1} of ${widget.book.keyPoints.length}'),
+          Text(
+              'Key Point ${currentKeyPointIndex + 1} of ${widget.book.keyPoints.length}'),
         ],
       ),
     );
@@ -154,7 +159,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          currentKeyPointIndex = index;
+          if (isPlaying) {
+            // If audio is playing, start playing from the beginning of the selected key point
+            stopAudio();
+            playAudio(widget.book.keyPoints[index].audioFile);
+            currentKeyPointIndex = index;
+          } else {
+            // If audio is not playing, update the current key point index
+            currentKeyPointIndex = index;
+          }
+          // currentKeyPointIndex = index;
         });
         // playAudio(widget.book.keyPoints[index].audioFile);
       },
@@ -185,7 +199,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       UrlSource sourceUri = UrlSource(audioFile);
 
       // Play audio
-      await audioPlayer.play(sourceUri, position: Duration(seconds: audioPlayerProgress.round()));
+      await audioPlayer.play(sourceUri,
+          position: Duration(seconds: audioPlayerProgress.round()));
       setState(() {
         isPlaying = true;
       });
