@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:reading_app1/models/book.dart';
@@ -9,11 +10,13 @@ Future<List<Book>> fetchBooksFromGithub() async {
       'https://api.github.com/repos/Oliver1703dk/books/contents/books/';
 
   try {
-    final http.Response response =
-        await http.get(Uri.parse(githubRepoUrl), headers: {
-      'Authorization':
-          'Bearer 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',
-    });
+    final http.Response response = await http.get(
+      Uri.parse(githubRepoUrl),
+      //     headers: {
+      //   'Authorization':
+      //       'Bearer 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',
+      // }
+    );
 
     if (response.statusCode == 200) {
       // final List<String> bookFolders =
@@ -51,46 +54,85 @@ Future<Book> createBookFromFolder(String baseUrl, String bookFolder) async {
   final String imageUrl = '$bookUrl/image.png';
   final String descUrl = '$bookUrl/desc.txt';
   final String keyPointsUrl = '$bookUrl/key_points.txt';
+  final String keyPointsTimeUrl = '$bookUrl/key_points_time.txt';
   // final String audioFolderUrl = '$bookUrl/audio/';
   final String audioFolderUrl = '$bookUrl/audio/';
   // print(keyPointsUrl);
   // print(descUrl);
   // print(audioFolderUrl);
   // print(imageUrl);
+  final String bookFolderName = bookFolder;
 
   final http.Response descResponse = await http.get(Uri.parse(descUrl));
   final http.Response keyPointsResponse =
       await http.get(Uri.parse(keyPointsUrl));
+  final http.Response keyPointsTimeResponse =
+      await http.get(Uri.parse(keyPointsTimeUrl));
 
-  if (descResponse.statusCode == 200 && keyPointsResponse.statusCode == 200) {
+  if (descResponse.statusCode == 200 &&
+      keyPointsResponse.statusCode == 200 &&
+      keyPointsTimeResponse.statusCode == 200) {
     final String title = descResponse.body.split('\n')[0];
     final String description = descResponse.body.split('\n')[1];
 
     final List<String> keyPoints = keyPointsResponse.body.split('\n');
+    final List<String> keyPointsTime = keyPointsTimeResponse.body.split('\n');
+    print(keyPoints.length);
+    print(keyPointsTime.length);
 
     final List<KeyPoint> keyPointList = [];
     for (int i = 0; i < keyPoints.length; i++) {
       final String keyPointText = keyPoints[i];
       final String audioFileUrl = '$audioFolderUrl${i + 1}.wav';
+      final int keyPointsTimeText = int.parse(keyPointsTime[i]);
 
       keyPointList.add(KeyPoint(
         text: keyPointText,
         audioFile: audioFileUrl,
         // Assuming the duration is constant for each key point, adjust as needed
-        duration: const Duration(seconds: 10),
+        // duration: Duration(seconds: 10),
+        duration: Duration(seconds: keyPointsTimeText),
+        // duration: Duration(seconds: await getWavFileLength(audioFileUrl)),
       ));
     }
 
     return Book(
-      title: title,
-      description: description,
-      coverImage: imageUrl,
-      keyPoints: keyPointList,
-    );
+        title: title,
+        description: description,
+        coverImage: imageUrl,
+        keyPoints: keyPointList,
+        directoryName: bookFolderName);
   } else {
     throw Exception('Failed to load book details');
   }
 }
+
+// Future<int> getWavFileLength(String fileUrl) async {
+//   try {
+//     // Download the first 44 bytes of the file (WAV header size)
+//     http.Response response = await http.get(Uri.parse(fileUrl));
+//     Uint8List headerBytes =
+//         Uint8List.fromList(response.bodyBytes.sublist(0, 44));
+
+//     // Extract information from the header
+//     ByteData headerData = ByteData.sublistView(headerBytes, 0, 44);
+//     int dataSize = headerData.getInt32(40, Endian.little);
+
+//     // Calculate the length based on the data size and sample rate
+//     int sampleRate = headerData.getInt32(24, Endian.little);
+//     int numberOfChannels = headerData.getUint16(22, Endian.little);
+//     int bitsPerSample = headerData.getUint16(34, Endian.little);
+
+//     double lengthInSeconds =
+//         dataSize / (sampleRate * numberOfChannels * (bitsPerSample / 8));
+
+//     // Return the length in seconds
+//     return lengthInSeconds.toInt();
+//   } catch (e) {
+//     print("Error: $e");
+//     return -1; // Return -1 to indicate an error
+//   }
+// }
 
 void main() async {
   try {
