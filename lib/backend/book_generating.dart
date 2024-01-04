@@ -11,29 +11,34 @@ Future<List<Book>> fetchBooksFromGithub() async {
       'https://api.github.com/repos/Oliver1703dk/books/contents/books/';
 
   try {
+    late http.Response response;
     try {
-      final http.Response response = await http.get(
+      // final http.Response
+      response = await http.get(
         Uri.parse(githubRepoUrl),
         //     headers: {
         //   'Authorization':
         //       'Bearer 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',
         // }
       );
+      print("Used normal link");
     } catch (e) {
       print("Error $e happend, using another way");
-      final http.Response response =
-          await http.get(Uri.parse(githubRepoUrl), headers: {
+      // final http.Response
+      response = await http.get(Uri.parse(githubRepoUrl), headers: {
         'Authorization':
             'Bearer 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',
       });
+      print("Used admin link");
     }
-    final http.Response response = await http.get(
-      Uri.parse(githubRepoUrl),
-      //     headers: {
-      //   'Authorization':
-      //       'Bearer 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',
-      // }
-    );
+    // TODO: Fix this
+    // final http.Response response = await http.get(
+    //   Uri.parse(githubRepoUrl),
+    //   //     headers: {
+    //   //   'Authorization':
+    //   //       'Bearer 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',
+    //   // }
+    // );
 
     if (response.statusCode == 200) {
       // final List<String> bookFolders =
